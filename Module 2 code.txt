@@ -1,0 +1,161 @@
+Sub Stockworkbook():
+For Each ws In Worksheets
+
+Dim t As Integer
+'Counter worksheets
+Dim WS_Count As Integer
+' Ws name
+'Dim WorksheetName As String
+'index for original list
+Dim i As Double
+Dim y As Double
+'index for summary on the right
+Dim j As Double
+'Index counter to fill Ticker row
+Dim Newcolumncount As Integer
+'Last row column A
+Dim LastRow As Double
+Dim Percentage As Double
+'Variables for second part
+Dim Tickername As String
+Dim Yearchange As Double
+Dim Totalsum As Double
+Dim GTotalV As Double
+Dim GIncrease As Double
+Dim Gdecrease As Double
+
+         
+' Set WS_Count equal to the number of worksheets in the active'
+
+ WS_Count = ActiveWorkbook.Worksheets.Count
+
+' Begin the loop.
+  For t = 1 To WS_Count
+  
+ Newcolumncount = 2
+ i = 2
+ j = 2
+ 'last row in column A
+ LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    For i = 2 To LastRow
+ 'if cycle that compares the ticker values
+        If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+        
+        Tickername = ws.Cells(i, 1).Value
+        ws.Cells(Newcolumncount, 9).Value = Tickername
+        
+        Yearchange = ws.Cells(i, 6).Value - ws.Cells(j, 3).Value
+        ws.Cells(Newcolumncount, 10).Value = Yearchange
+        Yearchange = 0
+        
+ 'cycle that creates  the summary
+     If ws.Cells(j, 3).Value = 0 Then
+     
+     ws.Cells(Newcolumncount, 11) = 0
+     
+     Else
+     
+     Percentage = ((ws.Cells(i, 6).Value - ws.Cells(j, 3).Value) / ws.Cells(j, 3).Value)
+     
+     ws.Cells(Newcolumncount, 11) = Format(Percentage, "percent")
+     
+     
+     
+     
+     End If
+     
+     Totalsum = WorksheetFunction.Sum(Range(ws.Cells(j, 7), ws.Cells(i, 7)))
+     
+     ws.Cells(Newcolumncount, 12).Value = Totalsum
+     
+     Totalsum = 0
+
+    Newcolumncount = Newcolumncount + 1
+    
+    j = i + 1
+    
+    End If
+'header names for the columns
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly Change"
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+ws.Cells(1, 16).Value = "Ticker"
+ws.Cells(1, 17).Value = "Value"
+ws.Cells(2, 15).Value = "Greatest % Increase"
+ws.Cells(3, 15).Value = "Greatest % Decrease"
+ws.Cells(4, 15).Value = "Greatest Total Volume"
+
+
+    If ws.Cells(Newcolumncount, 10).Value < 0 Then
+        ws.Cells(Newcolumncount, 10).Interior.ColorIndex = 7
+    Else
+    
+    
+    ws.Cells(Newcolumncount, 10).Interior.ColorIndex = 35
+    End If
+    
+        
+    
+    Next i
+    
+ 'second part, creation of the summary
+LastRow = ws.Cells(Rows.Count, 9).End(xlUp).Row
+
+GIncrease = ws.Cells(2, 11).Value
+GTotalV = ws.Cells(2, 12).Value
+Gdecrease = ws.Cells(2, 11).Value
+
+    For y = 2 To LastRow
+    
+        If ws.Cells(y, 12).Value > GTotalV Then
+            GTotalV = ws.Cells(y, 12).Value
+
+            ws.Cells(4, 16).Value = ws.Cells(y, 9).Value
+        
+            'ws.Cells(4, 17).Value = GTotalV
+        Else
+            GTotalV = GTotalV
+            'ws.Cells(4, 17).Value = GTotalV
+        End If
+    
+    
+         If ws.Cells(y, 11).Value > GIncrease Then
+              GIncrease = ws.Cells(y, 11).Value
+
+              ws.Cells(2, 16).Value = ws.Cells(y, 9).Value
+        
+            ' ws.Cells(2, 17).Value = GIncrease
+         Else
+    
+             GIncrease = GIncrease
+             'ws.Cells(2, 17).Value = GIncrease
+         End If
+   
+           
+         If ws.Cells(y, 11).Value < Gdecrease Then
+              Gdecrease = ws.Cells(y, 11).Value
+
+             ws.Cells(3, 16).Value = ws.Cells(y, 9).Value
+             'ws.Cells(3, 17).Value = Gdecrease
+        
+       
+         Else
+            Gdecrease = Gdecrease
+    
+   
+         End If
+   
+   
+    ws.Cells(3, 17).Value = Format(Gdecrease, "percent")
+    ws.Cells(4, 17).Value = GTotalV
+    ws.Cells(2, 17).Value = Format(GIncrease, "percent")
+    
+    Next y
+    
+    Next t
+    Next ws
+    
+
+End Sub
+
